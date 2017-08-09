@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"time"
@@ -16,12 +17,24 @@ var moveHandler *mover.MoveShowHandle
 func main() {
 
 	w := watcher.New()
-
 	w.IgnoreHiddenFiles(true)
 	w.FilterOps(watcher.Write)
 	q := simpleQueue.NewQueue(time.Millisecond * 400)
 
-	moveHandler = mover.NewMoveShowHandler("/Users/brentonmcsweyn/TvShows")
+	watchDir := flag.String("watchDir", "", "the folder to watch for incoming files")
+	homeTvDir := flag.String("homeTvDir", "", "the root folder for all TV Shows")
+
+	flag.Parse()
+	if *watchDir == "" {
+		log.Fatal("Missing watchDir  command flags")
+		return
+	}
+
+	if *homeTvDir == "" {
+		log.Fatal("Missing homeTvDir command flags")
+		return
+	}
+	moveHandler = mover.NewMoveShowHandler(*homeTvDir)
 	// Process events
 	go func() {
 		for {
@@ -46,7 +59,7 @@ func main() {
 		}
 	}()
 
-	if err := w.Add("/Users/brentonmcsweyn/Downloads"); err != nil {
+	if err := w.Add(*watchDir); err != nil {
 		log.Fatalln(err)
 	}
 
