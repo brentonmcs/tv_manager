@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"tvrename/mover"
 	"tvrename/renamer"
 
 	"github.com/howeyc/fsnotify"
@@ -22,7 +23,8 @@ func main() {
 			case ev := <-watcher.Event:
 				if ev.IsCreate() {
 					log.Println("event:", ev)
-					renamer.GetTvShowDetails(ev.Name)
+					tvShowDetails := renamer.GetTvShowDetails(ev.Name).RenameFile()
+					mover.MoveTvShowHome(tvShowDetails)
 				}
 			case err := <-watcher.Error:
 				log.Println("error:", err)
