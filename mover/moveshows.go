@@ -17,7 +17,6 @@ type MoveShowHandle struct {
 
 //NewMoveShowHandler creates a new Handle to manage moving shows
 func NewMoveShowHandler(watchDirectory string) *MoveShowHandle {
-
 	shows := findShows(watchDirectory)
 	return &MoveShowHandle{watchDirectory: watchDirectory, shows: shows}
 }
