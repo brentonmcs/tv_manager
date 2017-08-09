@@ -3,6 +3,7 @@ package mover
 import (
 	"os"
 	"testing"
+	"tvrename/renamer"
 
 	"github.com/satori/go.uuid"
 )
@@ -16,17 +17,17 @@ func TestFindShowDirectory(t *testing.T) {
 
 	shows := []string{"Bones", "Suits", "Game of Thrones"}
 
-	handler := MoveShowHandle{watchDirectory: "", shows: shows}
+	handler := MoveShowHandle{homeTvDirectory: "", shows: shows}
 
 	testCase := []testFindNames{
 		testFindNames{input: "Bone", expected: "Bones"},
 		testFindNames{input: "Bones", expected: "Bones"},
 		testFindNames{input: "bone", expected: "Bones"},
-		testFindNames{input: "bean", expected: ""},
+		testFindNames{input: "bean", expected: "bean"},
 		testFindNames{input: "suit", expected: "Suits"},
 		testFindNames{input: "gameofthrones", expected: "Game of Thrones"},
 		testFindNames{input: "GOT", expected: "Game of Thrones"},
-		testFindNames{input: "random", expected: ""},
+		testFindNames{input: "random", expected: "random"},
 	}
 
 	for _, tC := range testCase {
@@ -51,7 +52,7 @@ func TestSearchDirectory(t *testing.T) {
 	result := NewMoveShowHandler(dirName)
 
 	if len(result.shows) != 3 {
-		t.Fail()
+		t.Fatalf("Should be only 3 shows not %d", len(result.shows))
 	}
 
 	findResult := result.findShowDirectory("Bones")
@@ -61,6 +62,23 @@ func TestSearchDirectory(t *testing.T) {
 	}
 }
 
+func TestMovingFile(t *testing.T) {
+	dirName := "./" + uuid.NewV4().String()
+	os.Mkdir(dirName, 07777)
+	defer cleanupFolder(dirName)
+
+	handler := NewMoveShowHandler(dirName)
+
+	os.Create("test.txt")
+	tvShowDetails := &renamer.TvShowDetails{ComputedName: "Test S01E01.txt", Name: "Test", Path: "./test.txt", Season: 1}
+	handler.MoveTvShowHome(tvShowDetails)
+
+	_, err := os.Stat(dirName + "/Test/Season 1/Test S01E01.txt")
+
+	if err != nil {
+		t.Fatal("File has not been moved")
+	}
+}
 func cleanupFolder(dirName string) {
 	os.RemoveAll(dirName)
 }

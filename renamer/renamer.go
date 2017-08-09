@@ -2,20 +2,18 @@ package renamer
 
 import (
 	"fmt"
-	"log"
-	"os"
 	"path/filepath"
 	"strings"
 )
 
 //TvShowDetails holds the information about the show
 type TvShowDetails struct {
-	name         string
-	path         string
-	season       int
+	Name         string
+	Path         string
+	Season       int
 	episode      int
 	extension    string
-	computedName string
+	ComputedName string
 }
 
 type fileDetails struct {
@@ -37,27 +35,28 @@ func (p *parsedFileDetails) validSeasonFound() bool {
 //NewTvShowDetails constuctor
 func NewTvShowDetails(parsedFileDetails parsedFileDetails, extension, path string) *TvShowDetails {
 	computedName := fmt.Sprintf("%v S%02dE%02d.%v", strings.Title(parsedFileDetails.name), parsedFileDetails.season, parsedFileDetails.episode, extension)
-	return &TvShowDetails{name: parsedFileDetails.name, season: parsedFileDetails.season, episode: parsedFileDetails.episode, extension: extension, computedName: computedName, path: path}
+	return &TvShowDetails{Name: parsedFileDetails.name,
+		Season: parsedFileDetails.season, episode: parsedFileDetails.episode, extension: extension, ComputedName: computedName, Path: path}
 }
 
-//NewTvShowDetailsWithComputedPath constuctor - updates path to computed path
-func NewTvShowDetailsWithComputedPath(t *TvShowDetails) *TvShowDetails {
+// //NewTvShowDetailsWithComputedPath constuctor - updates path to computed path
+// func NewTvShowDetailsWithComputedPath(t *TvShowDetails) *TvShowDetails {
 
-	fName := filepath.Dir(t.path)
-	newPath := fName + "/" + t.computedName
-	return &TvShowDetails{name: t.name, path: newPath, computedName: t.computedName, extension: t.extension, season: t.season, episode: t.episode}
-}
+// 	newPath := filepath.Dir(t.Path) + "/" + t.ComputedName
+// 	return &TvShowDetails{Name: t.Name, Path: newPath, ComputedName: t.ComputedName,
+// 		extension: t.extension, Season: t.Season, episode: t.episode}
+// }
 
-//RenameFile takes the show details and renames them
-func (t *TvShowDetails) RenameFile() *TvShowDetails {
-	err := os.Rename(t.path, filepath.Dir(t.path)+"/"+t.computedName)
+// //RenameFile takes the show details and renames them
+// func (t *TvShowDetails) RenameFile() *TvShowDetails {
+// 	err := os.Rename(t.Path, filepath.Dir(t.Path)+"/"+t.computedName)
 
-	if err != nil {
-		log.Fatal("Failed to rename")
-	}
+// 	if err != nil {
+// 		log.Fatal("Failed to rename")
+// 	}
 
-	return NewTvShowDetailsWithComputedPath(t)
-}
+// 	return NewTvShowDetailsWithComputedPath(t)
+// }
 
 //GetTvShowDetails renames the file so it's a clean TV Show Name
 func GetTvShowDetails(path string) *TvShowDetails {

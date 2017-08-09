@@ -15,7 +15,7 @@ func main() {
 	}
 
 	done := make(chan bool)
-
+	moveHandler := mover.NewMoveShowHandler("/tvshows")
 	// Process events
 	go func() {
 		for {
@@ -23,8 +23,8 @@ func main() {
 			case ev := <-watcher.Event:
 				if ev.IsCreate() {
 					log.Println("event:", ev)
-					tvShowDetails := renamer.GetTvShowDetails(ev.Name).RenameFile()
-					mover.MoveTvShowHome(tvShowDetails)
+					tvShowDetails := renamer.GetTvShowDetails(ev.Name)
+					moveHandler.MoveTvShowHome(tvShowDetails)
 				}
 			case err := <-watcher.Error:
 				log.Println("error:", err)
