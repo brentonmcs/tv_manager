@@ -6,6 +6,7 @@ import (
 	"os"
 	"sort"
 	"strconv"
+	"strings"
 	"tvrename/renamer"
 
 	"github.com/renstrom/fuzzysearch/fuzzy"
@@ -27,6 +28,13 @@ func NewMoveShowHandler(homeTvDirectory string) *MoveShowHandle {
 func (m *MoveShowHandle) MoveTvShowHome(t *renamer.TvShowDetails) {
 	showDirectory := m.findShowDirectory(t.Name)
 	seasonDirectory := m.findSeasonDirectory(showDirectory, t.Season)
+
+	_, err := os.Stat(t.Path)
+	if err != nil {
+		log.Printf("Not Moving File from %v to %v as it does not exist", t.Path, seasonDirectory+"/"+t.ComputedName)
+		return
+	}
+	log.Printf("Moving File from %v to %v", t.Path, seasonDirectory+"/"+t.ComputedName)
 	os.Rename(t.Path, seasonDirectory+"/"+t.ComputedName)
 }
 
@@ -38,6 +46,7 @@ func (m *MoveShowHandle) findShowDirectory(showName string) string {
 
 	matches := fuzzy.RankFindFold(showName, m.shows)
 	if len(matches) == 0 {
+		showName = strings.Title(showName)
 		m.createDirectory(showName)
 		return showName
 	}

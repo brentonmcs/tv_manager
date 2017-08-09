@@ -34,29 +34,10 @@ func (p *parsedFileDetails) validSeasonFound() bool {
 
 //NewTvShowDetails constuctor
 func NewTvShowDetails(parsedFileDetails parsedFileDetails, extension, path string) *TvShowDetails {
-	computedName := fmt.Sprintf("%v S%02dE%02d.%v", strings.Title(parsedFileDetails.name), parsedFileDetails.season, parsedFileDetails.episode, extension)
+	computedName := fmt.Sprintf("%v S%02dE%02d%v", strings.Title(parsedFileDetails.name), parsedFileDetails.season, parsedFileDetails.episode, extension)
 	return &TvShowDetails{Name: parsedFileDetails.name,
 		Season: parsedFileDetails.season, episode: parsedFileDetails.episode, extension: extension, ComputedName: computedName, Path: path}
 }
-
-// //NewTvShowDetailsWithComputedPath constuctor - updates path to computed path
-// func NewTvShowDetailsWithComputedPath(t *TvShowDetails) *TvShowDetails {
-
-// 	newPath := filepath.Dir(t.Path) + "/" + t.ComputedName
-// 	return &TvShowDetails{Name: t.Name, Path: newPath, ComputedName: t.ComputedName,
-// 		extension: t.extension, Season: t.Season, episode: t.episode}
-// }
-
-// //RenameFile takes the show details and renames them
-// func (t *TvShowDetails) RenameFile() *TvShowDetails {
-// 	err := os.Rename(t.Path, filepath.Dir(t.Path)+"/"+t.computedName)
-
-// 	if err != nil {
-// 		log.Fatal("Failed to rename")
-// 	}
-
-// 	return NewTvShowDetailsWithComputedPath(t)
-// }
 
 //GetTvShowDetails renames the file so it's a clean TV Show Name
 func GetTvShowDetails(path string) *TvShowDetails {

@@ -23,11 +23,11 @@ func TestFindShowDirectory(t *testing.T) {
 		testFindNames{input: "Bone", expected: "Bones"},
 		testFindNames{input: "Bones", expected: "Bones"},
 		testFindNames{input: "bone", expected: "Bones"},
-		testFindNames{input: "bean", expected: "bean"},
+		testFindNames{input: "bean", expected: "Bean"},
 		testFindNames{input: "suit", expected: "Suits"},
 		testFindNames{input: "gameofthrones", expected: "Game of Thrones"},
 		testFindNames{input: "GOT", expected: "Game of Thrones"},
-		testFindNames{input: "random", expected: "random"},
+		testFindNames{input: "random", expected: "Random"},
 	}
 
 	for _, tC := range testCase {

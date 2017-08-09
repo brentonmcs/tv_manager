@@ -1,45 +1,60 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"time"
 	"tvrename/mover"
 	"tvrename/renamer"
+	"tvrename/simpleQueue"
 
-	"github.com/howeyc/fsnotify"
+	"github.com/radovskyb/watcher"
 )
 
-func main() {
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		log.Fatal(err)
-	}
+var moveHandler *mover.MoveShowHandle
 
-	done := make(chan bool)
-	moveHandler := mover.NewMoveShowHandler("/tvshows")
+func main() {
+
+	w := watcher.New()
+
+	w.IgnoreHiddenFiles(true)
+	w.FilterOps(watcher.Write)
+	q := simpleQueue.NewQueue(time.Millisecond * 400)
+
+	moveHandler = mover.NewMoveShowHandler("/Users/brentonmcsweyn/TvShows")
 	// Process events
 	go func() {
 		for {
 			select {
-			case ev := <-watcher.Event:
-				if ev.IsCreate() {
-					log.Println("event:", ev)
-					tvShowDetails := renamer.GetTvShowDetails(ev.Name)
-					moveHandler.MoveTvShowHome(tvShowDetails)
+			case event := <-w.Event:
+
+				if !event.FileInfo.IsDir() {
+					fmt.Printf("Not Directory")
+
+					q.Push(simpleQueue.Item{Name: event.Name(),
+						Fn: func() {
+							details := renamer.GetTvShowDetails(event.Path)
+							moveHandler.MoveTvShowHome(details)
+						},
+						StartAt: time.Now().Add(time.Second * 3)})
 				}
-			case err := <-watcher.Error:
-				log.Println("error:", err)
+			case err := <-w.Error:
+				log.Fatalln(err)
+			case <-w.Closed:
+				return
 			}
 		}
 	}()
 
-	err = watcher.Watch("/Users/brentonmcsweyn/tools")
-	if err != nil {
-		log.Fatal(err)
+	if err := w.Add("/Users/brentonmcsweyn/Downloads"); err != nil {
+		log.Fatalln(err)
 	}
 
-	// Hang so program doesn't exit
-	<-done
+	log.Println("Starting Queue")
+	q.Run()
 
-	/* ... do stuff ... */
-	watcher.Close()
+	log.Println("Starting Watcher")
+	if err := w.Start(time.Millisecond * 100); err != nil {
+		log.Fatalln(err)
+	}
 }
