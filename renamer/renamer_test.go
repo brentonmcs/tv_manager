@@ -62,6 +62,18 @@ func TestEndToEnd(t *testing.T) {
 	if result.ComputedName != "Test S01E01.local" {
 		t.Fatal("Computed Name is not matcheds")
 	}
+
+	result = GetTvShowDetails("/user/home/test.show.S01E01.local")
+
+	if result.ComputedName != "Test Show S01E01.local" {
+		t.Fatal("Computed Name is not matcheds")
+	}
+
+	result = GetTvShowDetails("/user/home/test_show.S01E01.local")
+
+	if result.ComputedName != "Test Show S01E01.local" {
+		t.Fatal("Computed Name is not matcheds")
+	}
 }
 
 func TestComputedName(t *testing.T) {
@@ -80,15 +92,3 @@ func TestComputedName(t *testing.T) {
 		t.Fatalf("Computed Name is not correct - expected %v, result %v", result.ComputedName, expected)
 	}
 }
-
-// func TestNewDetailsWithComputedPath(t *testing.T) {
-// 	details := NewTvShowDetails(parsedFileDetails{episode: 1, season: 1, name: "lower"}, "mp3", "/home/brenton/lower.mp3")
-
-// 	result := NewTvShowDetailsWithComputedPath(details)
-
-// 	expected := "/home/brenton/Lower S01E01.mp3"
-
-// 	if result.path != expected {
-// 		t.Fatalf("Path Name is not correct - expected %v, result %v", result.path, expected)
-// 	}
-// }

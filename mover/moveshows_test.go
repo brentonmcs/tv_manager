@@ -2,6 +2,8 @@ package mover
 
 import (
 	"os"
+	"path/filepath"
+	"runtime"
 	"testing"
 	"tvrename/renamer"
 
@@ -69,11 +71,18 @@ func TestMovingFile(t *testing.T) {
 
 	handler := NewMoveShowHandler(dirName)
 
-	os.Create("test.txt")
-	tvShowDetails := &renamer.TvShowDetails{ComputedName: "Test S01E01.txt", Name: "Test", Path: "./test.txt", Season: 1}
+	_, filename, _, _ := runtime.Caller(0)
+
+	path := filepath.Join(filepath.Dir(filename), "test.txt")
+	_, err := os.Create(path)
+	if err != nil {
+		t.Fatal("File was not created")
+	}
+
+	tvShowDetails := &renamer.TvShowDetails{ComputedName: "Test S01E01.txt", Name: "Test", Path: path, Season: 1}
 	handler.MoveTvShowHome(tvShowDetails)
 
-	_, err := os.Stat(dirName + "/Test/Season 1/Test S01E01.txt")
+	_, err = os.Stat(filepath.Join(dirName, "Test/Season 1/Test S01E01.txt"))
 
 	if err != nil {
 		t.Fatal("File has not been moved")

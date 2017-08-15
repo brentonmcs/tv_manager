@@ -79,6 +79,7 @@ func findDetails(file fileDetails) *TvShowDetails {
 	return NewTvShowDetails(parsedFileDetails, file.extension, file.path)
 }
 
-func removeDot(filename string) string {
-	return strings.Trim(strings.Replace(filename, ".", " ", -1), " ")
+func removeSymbols(filename string) string {
+	result := strings.Trim(strings.Replace(filename, ".", " ", -1), " ")
+	return strings.Trim(strings.Replace(result, "_", " ", -1), " ")
 }

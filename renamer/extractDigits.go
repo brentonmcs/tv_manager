@@ -40,5 +40,5 @@ func extractViaRegex(regex string, extractD extractdigits, filename string) pars
 
 	index := re.FindStringIndex(strings.ToUpper(filename))[0]
 	season, episode := extractD(seasonResult[0])
-	return parsedFileDetails{name: removeDot(filename[0:index]), season: season, episode: episode}
+	return parsedFileDetails{name: removeSymbols(filename[0:index]), season: season, episode: episode}
 }
