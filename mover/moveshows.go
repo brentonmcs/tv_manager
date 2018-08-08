@@ -1,7 +1,6 @@
 package mover
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -11,7 +10,6 @@ import (
 	"strings"
 	"tvrename/renamer"
 
-	"github.com/nightlyone/lockfile"
 	"github.com/renstrom/fuzzysearch/fuzzy"
 )
 
@@ -35,32 +33,23 @@ func (m *MoveShowHandle) MoveTvShowHome(t *renamer.TvShowDetails) {
 		return
 	}
 
-	showDirectory := m.findShowDirectory(t.Name)
-	seasonDirectory := m.findSeasonDirectory(showDirectory, t.Season)
-
-	lf, err := getFileLock(t.Path)
-	if err != nil {
+	if t.Name == "" {
+		log.Printf("Not moving file as Show %s folder not found", t.ComputedName)
 		return
 	}
-	os.Rename(t.Path, filepath.Join(seasonDirectory, t.ComputedName))
+	showDirectory := m.findShowDirectory(t.Name)
+	seasonDirectory := m.findSeasonDirectory(showDirectory, t.Season)
+	newShowPath := filepath.Join(seasonDirectory, t.ComputedName)
 
-	lf.Unlock()
+	log.Printf("Moving %s to the new path %s", t.Path, newShowPath)
+
+	err := os.Rename(t.Path, newShowPath)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
-func getFileLock(path string) (lockfile.Lockfile, error) {
-	lf, err := lockfile.New(path)
-	if err != nil {
-		fmt.Printf("Can not find file to lock")
-		return lf, err
-	}
-
-	err = lf.TryLock()
-	if err != nil {
-		fmt.Printf("Cannot lock %q, reason: %v", lf, err)
-		return lf, err
-	}
-	return lf, nil
-}
 func (m *MoveShowHandle) createDirectory(name string) string {
 	os.Mkdir(m.homeTvDirectory+"/"+name, 07777)
 	return name

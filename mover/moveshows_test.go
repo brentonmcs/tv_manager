@@ -43,7 +43,8 @@ func TestFindShowDirectory(t *testing.T) {
 
 func TestSearchDirectory(t *testing.T) {
 
-	dirName := "./" + uuid.NewV4().String()
+	uuid, _ := uuid.NewV4()
+	dirName := "./" + uuid.String()
 	defer cleanupFolder(dirName)
 	os.Mkdir(dirName, 07777)
 
@@ -65,7 +66,8 @@ func TestSearchDirectory(t *testing.T) {
 }
 
 func TestMovingFile(t *testing.T) {
-	dirName := "./" + uuid.NewV4().String()
+	uuid, _ := uuid.NewV4()
+	dirName := "./" + uuid.String()
 	os.Mkdir(dirName, 07777)
 	defer cleanupFolder(dirName)
 
